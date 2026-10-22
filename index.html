@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VideoMask · 原神攻略视频悬浮窗 · 文档</title>
+<meta name="description" content="BetterGI JS 脚本 VideoMask：把 B 站攻略视频浮在原神画面上，播到该打怪的地方自动暂停。">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 20px 72px;
+    font-family: "Microsoft YaHei", "PingFang SC", -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px; line-height: 1.75; color: #2c2c2a; background: #faf9f6;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 27px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.3px; }
+  .sub { color: #6b6a63; font-size: 14px; margin: 0 0 6px; }
+  .desc { color: #4a4a46; font-size: 14px; margin: 14px 0 28px; }
+  h2 {
+    font-size: 17px; font-weight: 600; margin: 40px 0 14px;
+    padding-bottom: 8px; border-bottom: 1px solid #e5e3dc;
+  }
+  code {
+    font-family: Consolas, "Courier New", monospace; font-size: 13px;
+    background: #f0eee7; padding: 2px 6px; border-radius: 4px; color: #4a4a46;
+  }
+  .kbd {
+    display: inline-block; min-width: 26px; text-align: center;
+    font-family: Consolas, monospace; font-size: 12px; font-weight: 600;
+    background: #fff; border: 1px solid #c9c6bc; border-bottom-width: 2px;
+    border-radius: 5px; padding: 1px 7px; color: #3a3a36;
+  }
+
+  /* ---------- 入口卡片 ---------- */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 8px; }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+  a.card {
+    display: block; text-decoration: none; color: inherit;
+    background: #fff; border: 1px solid #e5e3dc; border-radius: 10px;
+    padding: 16px 18px 15px; transition: border-color .15s, box-shadow .15s, transform .15s;
+  }
+  a.card:hover {
+    border-color: #185FA5; box-shadow: 0 4px 14px rgba(24, 95, 165, .10); transform: translateY(-1px);
+  }
+  a.card .t { display: block; font-size: 16px; font-weight: 600; color: #185FA5; margin-bottom: 4px; }
+  a.card .t .badge {
+    display: inline-block; font-size: 11px; font-weight: 400; vertical-align: 2px;
+    background: #e6f1fb; color: #185FA5; border-radius: 4px; padding: 1px 6px; margin-left: 6px;
+  }
+  a.card .d { display: block; font-size: 13.5px; color: #6b6a63; line-height: 1.65; }
+  a.card.plain .t { color: #2c2c2a; }
+
+  /* ---------- 下载与提示 ---------- */
+  .get {
+    background: #185FA5; color: #fff; border-radius: 10px; padding: 18px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .get .tt { font-size: 16px; font-weight: 600; margin: 0 0 3px; }
+  .get .dd { font-size: 13.5px; color: #cfe3f7; margin: 0; }
+  .get a {
+    flex: none; text-decoration: none; font-size: 14px; font-weight: 600;
+    background: #fff; color: #185FA5; border-radius: 7px; padding: 9px 18px;
+  }
+  .get a:hover { background: #e6f1fb; }
+  .tip, .ok {
+    border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 14px;
+  }
+  .tip { background: #e6f1fb; border-left: 3px solid #378add; }
+  .ok { background: #e1f5ee; border-left: 3px solid #1d9e75; }
+  .tip b, .ok b { color: #2c2c2a; }
+
+  img.shot {
+    display: block; width: 100%; height: auto; margin: 12px 0 4px;
+    border-radius: 8px; border: 1px solid #e5e3dc;
+  }
+  .cap { font-size: 13px; color: #8a8880; margin: 0 0 10px; }
+  .footer {
+    margin-top: 52px; padding-top: 20px; border-top: 1px solid #e5e3dc;
+    font-size: 13px; color: #8a8880;
+  }
+  .footer a { color: #185FA5; text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>VideoMask · 原神攻略视频悬浮窗</h1>
+  <p class="sub">BetterGI JS 脚本 &nbsp;·&nbsp; 版本 1.6.29</p>
+  <p class="desc">
+    把 B 站攻略视频浮在游戏画面上，边玩边看；播到「该你打怪了」的地方自动暂停。
+    鼠标默认穿透给游戏，按住 <span class="kbd">Alt</span> 才临时接管。
+  </p>
+
+  <img class="shot" src="docs/img/demo-play.webp" width="720" alt="攻略视频浮在游戏画面上，边玩边看">
+  <p class="cap">边玩边看：视频浮在画面上，鼠标默认穿透给游戏。</p>
+
+  <h2>先下安装包</h2>
+  <div class="get">
+    <div>
+      <p class="tt">下载最新版本</p>
+      <p class="dd">解压后把整个 <code style="background:rgba(255,255,255,.15);color:#fff">VideoMask</code> 文件夹放进 BetterGI 的脚本目录</p>
+    </div>
+    <a href="https://github.com/xuan251/BetterGI-VideoMask/releases/latest">前往 Release 下载</a>
+  </div>
+
+  <h2>文档</h2>
+  <div class="grid">
+    <a class="card" href="手动安装教程.html">
+      <span class="t">手动安装教程<span class="badge">第一次装</span></span>
+      <span class="d">12 步，每步带 BGI 界面示意图和「怎么验证做对了」；末尾 5 条装完自检、6 类故障对照。</span>
+    </a>
+    <a class="card" href="使用教程.html">
+      <span class="t">使用教程<span class="badge">已经装好</span></span>
+      <span class="d">怎么选片、热键怎么改、打怪点怎么调、怎么加自己的 mp4、卡住了怎么办。</span>
+    </a>
+    <a class="card plain" href="https://github.com/xuan251/BetterGI-VideoMask/blob/main/给AI的安装指令.md">
+      <span class="t">给 AI 的安装指令</span>
+      <span class="d">不想自己点？把这份整份发给你常用的 AI 助手，它会找目录、复制文件、改配置、逐项校验。</span>
+    </a>
+    <a class="card plain" href="https://github.com/xuan251/BetterGI-VideoMask/blob/main/docs/开发记录.md">
+      <span class="t">开发记录</span>
+      <span class="d">实现原理、每个功能的取舍、踩过的坑。想知道 1526 个打怪点是怎么来的，看这里。</span>
+    </a>
+    <a class="card plain" href="https://github.com/xuan251/BetterGI-VideoMask/blob/main/CHANGELOG.md">
+      <span class="t">更新日志</span>
+      <span class="d">每个版本改了什么，越往下越老。</span>
+    </a>
+    <a class="card plain" href="https://github.com/xuan251/BetterGI-VideoMask">
+      <span class="t">GitHub 仓库首页</span>
+      <span class="d">源码、Issues、功能总览。遇到问题可以在那里提。</span>
+    </a>
+  </div>
+
+  <h2>装完怎么确认</h2>
+  <div class="ok">
+    <b>1.</b> BGI 脚本列表里出现「<b>视频悬浮窗</b>」；
+    <b>2.</b> 运行后画面上浮出一个窗口，第一次是一张半透明引导页；
+    <b>3.</b> 按 <span class="kbd">Insert</span> 拿回鼠标，点「打开节目单」能看见地图列表。
+    <br>三条都过 = 装好了。任何一条不过，翻<a href="手动安装教程.html" style="color:#185FA5">手动安装教程</a>第 9、10 章。
+  </div>
+
+  <div class="tip">
+    <b>最常踩的一个坑：</b>解压后多套了一层文件夹。<code>main.js</code> 必须正好在
+    <code>VideoMask\</code> 这一层，不能是 <code>VideoMask\VideoMask\main.js</code>。
+  </div>
+
+  <img class="shot" src="sidebar.png" width="720" alt="四级侧栏：地图 → 分类 → 版本 → 分P">
+  <p class="cap">四级侧栏：地图 → 分类（宝箱 / 神瞳 / 主线…）→ 版本 → 分 P。</p>
+
+  <div class="footer">
+    <a href="https://github.com/xuan251/BetterGI-VideoMask">GitHub</a> ·
+    <a href="https://github.com/xuan251/BetterGI-VideoMask/releases/latest">下载</a> ·
+    <a href="https://github.com/babalae/better-genshin-impact">BetterGI</a><br>
+    攻略视频与字幕来自 UP 主
+    <a href="https://space.bilibili.com/431073645">影月月</a>，版权归原作者；
+    本脚本只把公开视频嵌到浮窗里播放，不下载、不转存、不二次分发。<br>
+    与米哈游 / HoYoverse、B 站、BetterGI 官方均无关联。代码以 MIT 协议开源。
+  </div>
+
+</div>
+</body>
+</html>

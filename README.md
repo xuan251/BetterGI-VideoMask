@@ -150,6 +150,7 @@ assets/combat/          战斗检测模板说明
 先看我.txt               解压后第一眼看到的短说明
 docs/开发记录.md         实现原理 / 设计取舍 / 踩过的坑
 CHANGELOG.md            每个版本改了什么
+index.html              文档站入口页（GitHub Pages 用，装脚本时用不到）
 ```
 
 ## 更新日志
