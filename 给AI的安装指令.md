@@ -1,4 +1,4 @@
-# 给 AI 的安装指令 · VideoMask v1.6.28
+# 给 AI 的安装指令 · VideoMask v1.6.29
 
 > 用法：把本文件（或下面全部内容）直接发给你的 AI 助手，让它照做。
 > 它需要的权限：读写本地文件、执行 PowerShell 命令。
@@ -168,8 +168,8 @@ if ($txt -match '"runBackgroundEnabled"\s*:\s*(true|false)') {
 | 检查 | 期望 |
 |------|------|
 | `<BGI>\User\JsScript\VideoMask\main.js` | 直接存在（不是多套一层） |
-| `main.js` 内 `SCRIPT_VERSION` | `"1.6.28"` |
-| `manifest.json` 的 `version` | `1.6.28` |
+| `main.js` 内 `SCRIPT_VERSION` | `"1.6.29"` |
+| `manifest.json` 的 `version` | `1.6.29` |
 | `settings.json` 里 `marksOn` 的 `default` | `true`（打怪点暂停默认开） |
 | `settings.json` 里 `hkPlayPause` 的 `default` | `"~"` |
 | `assets\player.html` | 存在且含 `打开节目单` |
@@ -196,13 +196,17 @@ if ($txt -match '"runBackgroundEnabled"\s*:\s*(true|false)') {
 
 | 搜什么 | 含义 | 处理 |
 |--------|------|------|
-| `VideoMask v1.6.28 启动` | 脚本起来了 | 没有 = 路径层级错或脚本列表没刷新 |
+| `VideoMask v1.6.29 启动` | 脚本起来了 | 没有 = 路径层级错或脚本列表没刷新 |
+| `已把 BGI 的实时触发挂回来` | 自动拾取/自动剧情已在脚本里重新挂上 | 没有 = BGI 版本偏老（缺 `dispatcher.addTrigger`），日志会跟着一条警告 |
 | `JS HTTP` / `不允许请求此 URL` | 权限没生效 | 回第 3 步核对 hash |
 | `取直链失败` + `412` | B站风控 | 让用户在设置里填 SESSDATA |
 | `取视频地址超时` | 网络 | 点画面上的「重试」 |
 | `视频起播超时` | mp4 地址失效/慢 | 点「重新获取」 |
 
-用户若反馈"过剧情还是不动"：确认 BGI 设置里的「后台运行」是开的，然后**重启 BGI**（配置改动有时要重启才生效）。
+用户若反馈"自动拾取 / 自动剧情还是不动"：先看日志里有没有 `已把 BGI 的实时触发挂回来`。
+- 有 → 那是**截图遮挡**：让用户把浮窗挪到画面边角，或在 BGI 启动页把截图方式换成 `WindowsGraphicsCapture`；
+  再不然确认 BGI 设置里的「后台运行」是开的，然后**重启 BGI**（配置改动有时要重启才生效）。
+- 没有 → BGI 版本偏老，让他升级 BGI 后重开脚本。
 
 ---
 

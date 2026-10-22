@@ -2,7 +2,7 @@
 
 **在游戏画面上浮一个视频窗口，边玩边看；播到「该你打怪了」的地方，它自己暂停。**
 
-![version](https://img.shields.io/badge/version-1.6.28-blue) ![platform](https://img.shields.io/badge/BetterGI-%E2%89%A5%200.50.0-brightgreen) ![license](https://img.shields.io/badge/license-MIT-black) ![platform](https://img.shields.io/badge/Windows-10%20%2F%2011-0078D6)
+![version](https://img.shields.io/badge/version-1.6.29-blue) ![platform](https://img.shields.io/badge/BetterGI-%E2%89%A5%200.50.0-brightgreen) ![license](https://img.shields.io/badge/license-MIT-black) ![platform](https://img.shields.io/badge/Windows-10%20%2F%2011-0078D6)
 
 一个 [BetterGI](https://github.com/babalae/better-genshin-impact) 的 **JS 脚本**（不是独立程序）。
 装上后，[影月月](https://space.bilibili.com/431073645) 的攻略视频直接浮在游戏上，
@@ -27,6 +27,7 @@
 | **本地视频也支持** | 把 mp4 丢进 `assets/videos/`，侧栏顶部会多出「本地视频」卡片 |
 | **鼠标穿透** | 默认穿透给游戏；按住 `Alt` 临时接管（拖进度条、点暂停），松开 250ms 自动还回去 |
 | **不抢游戏焦点** | 启动只显示引导页，**选了地图才开播**；调完设置自动切回穿透，不影响 BetterGI 的自动剧情 |
+| **跟 BGI 自带功能共存** | 自动拾取、自动剧情照常工作：BGI 跑 JS 脚本前会把它们关掉，脚本按你原本的设置再挂回来 |
 | **自动记忆** | 位置、大小、透明度、音量、倍速、看到第几秒，下次启动直接接上；播完还能「看完续播」下一集 |
 | **字幕 + 方向提示** | 主播在说哪句、该往哪走，直接显示在画面下方（需要填 SESSDATA，见下） |
 | **顺手的小东西** | 弹幕投影、收藏夹、肝度统计、一键截图校准、分辨率自适应 |
@@ -71,10 +72,22 @@
 
 ## 常见问题（挑几个最容易踩的）
 
-**开了浮窗，BetterGI 的自动剧情就不动了？**
-浮窗进入"可交互"时会抢游戏前台焦点，游戏一失焦，BGI 在没开「后台运行」的情况下就点不到游戏。
-v1.6.27 已把两个主要触发从源头掐掉（启动后可拖动秒数默认 0、悬停热区默认关）。
-还不行就：`Insert` 切回穿透，或去 BGI 设置开「**后台运行**」（最彻底）。
+**开了浮窗，BetterGI 的自动拾取 / 自动剧情就不动了？**
+
+两个原因，第一个 v1.6.29 已经在脚本里解决：
+
+1. **BGI 跑 JS 脚本前会把它自己的实时触发全部关掉。** 这是 BGI 的设计，官方 FAQ 原话是
+   「你在实时触发里的所有配置都会在 JS 脚本运行前关闭……除非 JS 作者在代码中开启」。
+   所以不是"两个功能打架"，是自动拾取/自动剧情压根没启动。
+   现在脚本会用 `dispatcher.addTrigger` 按你在 BGI 里**原本的设置**把它们挂回来——
+   BGI 里本来就关着的不会被强行打开，设置面板里也能单独关掉这项代管。
+2. **抢前台焦点。** 浮窗"可交互"时游戏会失焦，BGI 在没开「后台运行」的情况下点不到游戏。
+   v1.6.27 已把两个主要触发从源头掐掉（启动后可拖动秒数默认 0、悬停热区默认关）。
+   还不行就：`Insert` 切回穿透，或去 BGI 设置开「**后台运行**」（最彻底）。
+
+另外：这些功能靠截图识别，浮窗如果正好压在**拾取提示**或**对话选项**上，识别区域被视频挡住就会失效。
+把窗口挪到画面边角，或在 BGI 启动页把截图方式换成 **WindowsGraphicsCapture**
+（只截游戏窗口内容，不把浮窗算进去）。
 
 **一直转圈 / 黑屏？**
 取地址 12 秒、起播 25 秒都会超时，画面会直接告诉你原因并给「重试」按钮，不用干等。

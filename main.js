@@ -18,7 +18,7 @@
 (async function () {
   "use strict";
 
-  const SCRIPT_VERSION = "1.6.28";
+  const SCRIPT_VERSION = "1.6.29";
   const WINDOW_ID = "videomask";
   const st = (typeof settings === "undefined" || settings === null) ? {} : settings;
 
@@ -436,6 +436,13 @@
       }
       return v;
     })(),
+    // BGI 实时触发保活（v1.6.29）
+    // BGI 在跑 JS 脚本前会把它自己的「实时触发」全部关掉（官方 FAQ 明说）。
+    // 结果就是：开着浮窗，自动拾取不捡东西、自动剧情卡在对话里，看起来像两个功能打架。
+    // 这里用 dispatcher.addTrigger 把它们按 BGI 里原本的设置挂回去。
+    // 两个开关是"要不要替用户挂回去"，不是"强开"——BGI 里本来就关着的不会被打开。
+    bgiKeepPick: bool("bgiKeepPick", true),
+    bgiKeepSkip: bool("bgiKeepSkip", true),
     clickThrough: !bool("interactiveAtStart", false),
     showTip: bool("showTip", true),
     // 动作热键：播放/暂停默认 F9（开箱即用），其余留空 —— 没填的键一个都不占。
@@ -497,6 +504,104 @@
     }
     out.sort();
     return out;
+  }
+
+  /* ==========================================================================
+   *  BGI 实时触发保活：自动拾取 / 自动剧情（v1.6.29）
+   *
+   *  现象：装上浮窗后，BGI 的「自动拾取」不捡东西、「自动剧情」卡在对话里。
+   *  根因不是鼠标穿透，也不是抢焦点，而是 BGI 的设计：跑 JS 脚本前会把它自己的
+   *  实时触发全部关掉（官方 FAQ「为什么不拾取/不吃药/不点剧情」写得很直白：
+   *  「你在实时触发里的所有配置都会在 JS 脚本运行前关闭……除非 JS 作者在代码中开启」）。
+   *
+   *  做法：用 dispatcher.addTrigger() 重新注册 RealtimeTimer 把任务挂回去。
+   *  必须用 addTrigger 而不是 addTimer —— 后者会把已挂的任务全清掉。
+   *
+   *  只挂用户在 BGI 里本来就开着的：读 <BGI>\User\config.json 里的
+   *  autoPickConfig.enabled / autoSkipConfig.enabled 判断，关着的不强行开。
+   *  读不到（老版本 BGI / 文件被锁 / 路径受限）就按设置面板那两个勾选走，默认开。
+   *
+   *  另一个已知限制：这些任务靠截图识别，如果浮窗正好压在「拾取提示」或「对话选项」
+   *  上，识别区域被视频挡住就会失效。要么把窗口挪开，要么在 BGI 启动页把截图方式
+   *  换成 WindowsGraphicsCapture（只截游戏窗口内容，不含浮窗）。
+   * ========================================================================== */
+  const BGI_USER_CONFIG = "../../config.json";   // 脚本在 User/JsScript/VideoMask 下
+
+  function readBgiUserConfig() {
+    try {
+      if (typeof file === "undefined" || !file || typeof file.readTextSync !== "function") return null;
+      let txt = null;
+      const tries = [BGI_USER_CONFIG, "..\\..\\config.json"];
+      for (let i = 0; i < tries.length && txt === null; i++) {
+        try { txt = file.readTextSync(tries[i]); } catch (e) { txt = null; }
+      }
+      if (!txt) return null;
+      const s = String(txt).replace(/^\uFEFF/, "").trim();
+      if (!s) return null;
+      const o = JSON.parse(s);
+      return (o && typeof o === "object") ? o : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // 返回 true / false / null（null = 不知道，按默认开）
+  function bgiEnabledFlag(cfg, key) {
+    if (!cfg) return null;
+    const sec = cfg[key];
+    if (!sec || typeof sec !== "object") return null;
+    if (typeof sec.enabled === "boolean") return sec.enabled;
+    if (typeof sec.Enabled === "boolean") return sec.Enabled;
+    return null;
+  }
+
+  function restoreBgiRealtimeTasks() {
+    const want = [
+      { name: "AutoPick", label: "自动拾取", cfgKey: "autoPickConfig", on: CFG.bgiKeepPick },
+      { name: "AutoSkip", label: "自动剧情", cfgKey: "autoSkipConfig", on: CFG.bgiKeepSkip },
+    ];
+    let anyOn = false;
+    for (let i = 0; i < want.length; i++) if (want[i].on) anyOn = true;
+    if (!anyOn) {
+      log.info("设置里「自动拾取」「自动剧情」的共存开关都关着：不替 BGI 挂回实时触发。");
+      return;
+    }
+    if (typeof dispatcher === "undefined" || !dispatcher || typeof dispatcher.addTrigger !== "function") {
+      log.warn("⚠ 这个 BGI 版本没有 dispatcher.addTrigger，没法把自动拾取/自动剧情挂回来（需要较新的 BGI）。" +
+        "升级 BGI 后重开脚本即可；不升级就只能二选一：要么关浮窗，要么只玩浮窗。");
+      return;
+    }
+    if (typeof RealtimeTimer === "undefined") {
+      log.warn("⚠ 这个 BGI 版本没有 RealtimeTimer，没法把自动拾取/自动剧情挂回来，请升级 BGI。");
+      return;
+    }
+
+    const cfg = readBgiUserConfig();
+    if (!cfg) {
+      log.warn("读不到 BGI 的 User/config.json（不影响看视频）。自动拾取/自动剧情先按默认挂上，" +
+        "如果 BGI 里本来是关的，取消勾选设置里的那两项就行。");
+    }
+
+    const added = [], offInBgi = [], failed = [];
+    for (let i = 0; i < want.length; i++) {
+      const w = want[i];
+      if (!w.on) continue;
+      if (bgiEnabledFlag(cfg, w.cfgKey) === false) { offInBgi.push(w.label); continue; }
+      try {
+        dispatcher.addTrigger(new RealtimeTimer(w.name));
+        added.push(w.label);
+      } catch (e) {
+        failed.push(w.label + "（" + ((e && e.message) ? e.message : String(e)) + "）");
+      }
+    }
+    if (added.length) {
+      log.info("已把 BGI 的实时触发挂回来：" + added.join("、") +
+        "。BGI 跑 JS 脚本时会默认把它们关掉，不挂回来就是「开了浮窗就不捡东西、不过剧情」。");
+    }
+    if (offInBgi.length) log.info("BGI 设置里本来就关着，不强行打开：" + offInBgi.join("、"));
+    if (failed.length) {
+      log.warn("这些实时触发没挂上：" + failed.join("；") + "。可以到 BGI 里手动确认，或升级 BGI 版本。");
+    }
   }
 
   /* 暂停密度：同一集里两个点靠得太近就合并，否则连着停两次很烦。
@@ -3085,6 +3190,12 @@
     if (state.interactive) log.info("叠层启动时就是【可交互】状态，可以直接拖动视频。");
 
     setupHook();
+
+    // v1.6.29：BGI 跑 JS 脚本时会把它自己的实时触发（自动拾取 / 自动剧情）全关掉，
+    // 这里按用户原本的设置挂回来，否则「边看攻略边让它自动捡东西/过剧情」是不可能成立的。
+    try { restoreBgiRealtimeTasks(); } catch (e) {
+      log.warn("挂回 BGI 实时触发失败：" + ((e && e.message) ? e.message : String(e)));
+    }
 
     // v1.6.23：进度条热区 / 悬停模式开着时，鼠标一搭到浮窗，浮窗就抢前台焦点
     // （BGI 在 setClickThrough 里 SetForegroundWindow+Activate），游戏失焦 → BGI 自带

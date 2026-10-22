@@ -131,6 +131,21 @@
     "type": "separator"
   },
   {
+    "name": "bgiKeepPick",
+    "type": "checkbox",
+    "label": "让 BGI 的自动拾取跟浮窗一起用（BGI 跑 JS 脚本前会把它自己的实时触发关掉，这里替你挂回来。BGI 设置里本来就关着的不受影响）",
+    "default": true
+  },
+  {
+    "name": "bgiKeepSkip",
+    "type": "checkbox",
+    "label": "让 BGI 的自动剧情跟浮窗一起用（同上。注意浮窗如果压在对话选项上会挡住识别，把窗口挪开或换 WindowsGraphicsCapture 截图方式）",
+    "default": true
+  },
+  {
+    "type": "separator"
+  },
+  {
     "name": "combatPause",
     "type": "checkbox",
     "label": "检测到战斗自动暂停视频（用 BGI 的 OCR 识别，不需要模板）",
