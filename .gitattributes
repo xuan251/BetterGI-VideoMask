@@ -1,0 +1,18 @@
+# 统一换行：仓库和检出都用 LF（JS / JSON / HTML 都不在意，跨平台最省事）
+* text=auto eol=lf
+
+*.js      text
+*.json    text
+*.html    text
+*.md      text
+*.txt     text
+
+# 图片按二进制处理，别做换行转换
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+
+# GitHub 语言统计：别把教程 HTML 算成主体
+*.html    linguist-documentation
+docs/*    linguist-documentation

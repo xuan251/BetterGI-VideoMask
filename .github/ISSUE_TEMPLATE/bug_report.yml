@@ -1,0 +1,73 @@
+name: 报个 Bug
+description: 用着不对劲 —— 黑屏、转圈、暂停点不对、自动剧情失效之类
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        先看一眼 [使用教程.html 的「卡住了怎么办」](../blob/main/使用教程.html)，
+        最常见的几个坑（JS HTTP 权限、SESSDATA、后台运行）都在那儿。
+
+  - type: input
+    id: version
+    attributes:
+      label: VideoMask 版本
+      description: 浮窗标题栏或 BetterGI 脚本列表里能看到，形如 1.6.28
+      placeholder: 1.6.28
+    validations:
+      required: true
+
+  - type: input
+    id: bgi
+    attributes:
+      label: BetterGI 版本
+      description: BetterGI 设置 → 关于
+      placeholder: 0.50.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 系统
+      options:
+        - Windows 11
+        - Windows 10
+        - 其它（写在下面）
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: 现象
+      description: 你做了什么、看到什么、期望是什么
+      placeholder: |
+        按下 Alt 点 ☰ 开了侧栏，选完视频松开 Alt，侧栏没关，得再点一次 ☰。
+        期望：松开 Alt 就自动收回去。
+    validations:
+      required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: BetterGI 日志（相关的那几行）
+      description: BetterGI 主界面下方「日志」面板里复制，带 `VideoMask` 字样的都贴上来
+      render: text
+
+  - type: textarea
+    id: shot
+    attributes:
+      label: 截图
+      description: 直接把图拖进这个框就行 —— 画面上的问题，一张图顶十行字
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认一下
+      options:
+        - label: 我用的不是自己改过的版本（改过的话请说明改了什么）
+          required: false
+        - label: 我已经勾了 BetterGI 的「JS HTTP 权限」
+          required: false

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>视频悬浮窗 VideoMask · 使用教程</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 20px 80px;
+    font-family: "Microsoft YaHei", "PingFang SC", -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px; line-height: 1.75; color: #2c2c2a; background: #faf9f6;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 26px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.3px; }
+  .sub { color: #6b6a63; font-size: 14px; margin: 0 0 28px; }
+  h2 {
+    font-size: 19px; font-weight: 600; margin: 44px 0 14px;
+    padding-bottom: 8px; border-bottom: 1px solid #e5e3dc;
+  }
+  h2 .num {
+    display: inline-block; width: 26px; height: 26px; line-height: 26px;
+    text-align: center; font-size: 14px; border-radius: 50%;
+    background: #185FA5; color: #fff; margin-right: 8px; vertical-align: 2px;
+  }
+  h3 { font-size: 16px; font-weight: 600; margin: 26px 0 8px; }
+  p { margin: 10px 0; }
+  ul, ol { margin: 10px 0; padding-left: 24px; }
+  li { margin: 6px 0; }
+  code {
+    font-family: Consolas, "Courier New", monospace; font-size: 13px;
+    background: #f0eee7; padding: 2px 6px; border-radius: 4px; color: #4a4a46;
+  }
+  pre {
+    background: #2c2c2a; color: #e8e6df; padding: 14px 16px; border-radius: 8px;
+    overflow-x: auto; font-size: 13px; line-height: 1.6;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #e5e3dc; vertical-align: top; }
+  th { background: #f2f0e9; font-weight: 600; font-size: 13px; color: #4a4a46; }
+  tr:last-child td { border-bottom: none; }
+  .card { background: #fff; border: 1px solid #e5e3dc; border-radius: 10px; padding: 18px 20px; margin: 16px 0; }
+  .tip, .warn, .ok {
+    border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-size: 14px;
+  }
+  .tip { background: #e6f1fb; border-left: 3px solid #378add; }
+  .warn { background: #fcebeb; border-left: 3px solid #e24b4a; }
+  .ok { background: #e1f5ee; border-left: 3px solid #1d9e75; }
+  .tip b, .warn b, .ok b { font-weight: 600; }
+  img { max-width: 100%; border-radius: 8px; border: 1px solid #e5e3dc; margin: 12px 0; }
+  .kbd {
+    display: inline-block; min-width: 26px; text-align: center;
+    font-family: Consolas, monospace; font-size: 12px; font-weight: 600;
+    background: #fff; border: 1px solid #c9c6bc; border-bottom-width: 2px;
+    border-radius: 5px; padding: 1px 7px; color: #3a3a36;
+  }
+  .steps { counter-reset: s; list-style: none; padding-left: 0; }
+  .steps > li {
+    counter-increment: s; position: relative; padding-left: 40px; margin: 16px 0;
+  }
+  .steps > li::before {
+    content: counter(s); position: absolute; left: 0; top: 1px;
+    width: 26px; height: 26px; line-height: 26px; text-align: center;
+    border-radius: 50%; background: #e6f1fb; color: #185fa5;
+    font-size: 13px; font-weight: 600;
+  }
+  .footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid #e5e3dc; font-size: 13px; color: #8a8880; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>视频悬浮窗 VideoMask</h1>
+  <p class="sub">把原神攻略视频浮在游戏窗口上，边玩边看 · 版本 1.6.28</p>
+
+  <p>这是一个 <b>BetterGI 的 JS 脚本</b>。装好之后，游戏画面上会浮一个可以拖动、可以收起的视频窗口，
+  里面直接播 B 站的攻略视频；播到"该你打怪"的地方会<b>自动暂停</b>，让你自己打完再继续。</p>
+
+  <img src="sidebar.png" alt="界面示意">
+
+  <h2><span class="num">1</span>装之前要有的东西</h2>
+
+  <table>
+    <tr>
+      <th style="width:130px">必需</th>
+      <td><b>BetterGI</b>（版本 0.50.0 或更新）<br>
+        <span style="color:#6b6a63;font-size:13px">BetterGI 是一个原神自动化工具，本脚本是它的插件，不能单独运行。</span></td>
+    </tr>
+    <tr>
+      <th>系统</th>
+      <td>Windows 10 / 11，需要 BetterGI 自带的 WebView2（一般装好 BGI 就有了）</td>
+    </tr>
+    <tr>
+      <th>可选</th>
+      <td>B 站账号的 SESSDATA —— 只有想看<b>字幕</b>和<b>方向箭头提示</b>才需要，不给也能正常播</td>
+    </tr>
+  </table>
+
+  <h2><span class="num">2</span>安装（四步）</h2>
+
+  <div class="ok">
+    <b>懒得动手？让你的 AI 装。</b>把同目录的
+    <code>给AI的安装指令.md</code> 整份发给你常用的 AI 助手，
+    它会自己找 BetterGI 目录、复制文件、改配置、逐项校验，最后只剩第 2 步的勾选要你点。
+  </div>
+
+  <ol class="steps">
+    <li>
+      <b>把 <code>VideoMask</code> 文件夹整个放进 BetterGI 的脚本目录</b><br>
+      目标路径：<code>BetterGI\User\JsScript\VideoMask\</code><br>
+      <span style="color:#6b6a63;font-size:13px">放完之后，<code>main.js</code> 应该正好在这个路径下：
+      <code>...\BetterGI\User\JsScript\VideoMask\main.js</code>，不要多套一层文件夹。</span>
+    </li>
+    <li>
+      <b>在 BetterGI 设置里勾上「JS HTTP 权限」</b><br>
+      <span style="color:#6b6a63;font-size:13px">侧栏、弹幕、字幕、合集列表都要靠它联网，不开就只有一个空窗口。</span>
+    </li>
+    <li>
+      <b>刷新 BetterGI</b><br>
+      在脚本列表里点刷新，应该能看到一个叫「<b>视频悬浮窗</b>」的脚本。<br>
+      <span style="color:#6b6a63;font-size:13px">
+      想让「全自动 → 调度器」里也能直接跑它：调度器 → 选中配置组 → 右键「添加」→ 选 JS 脚本 → 视频悬浮窗。
+      用上面的 AI 指令安装的话，这一步会连权限一起自动配好。</span>
+    </li>
+    <li>
+      <b>运行它</b><br>
+      游戏画面上会出现一个视频窗口。第一次是一张半透明的引导页（写着「还没选视频」），
+      按 <span class="kbd">Insert</span> 后点「打开节目单」选一集即可。
+    </li>
+  </ol>
+
+  <div class="tip">
+    <b>为什么第一次不直接播？</b> 攻略是按地区分的（枫丹 / 须弥 / 璃月…），
+    随便播一个大概率不是你要看的那集。所以第一次让你选一次，
+    <b>选过之后就记住了</b>——以后启动直接接着上次那一集播，引导页不会再出现。
+  </div>
+
+  <h2><span class="num">3</span>第一次用：选一集来看</h2>
+
+  <p>运行之后，视频窗口里会出现一张<b>引导页</b>（半透明，游戏画面能看到），上面写着
+  「还没选视频」和一个黄色的「<b>打开节目单</b>」按钮。</p>
+
+  <ol class="steps">
+    <li>按 <span class="kbd">Insert</span> 把鼠标"要回来"（这时候鼠标可以点浮窗，游戏暂时不动）</li>
+    <li>点黄色按钮「<b>打开节目单</b>」（点窗口任意位置也行）</li>
+    <li>按「<b>地区 → 分类 → 系列 → 分P</b>」一层层点进去，点到某一集</li>
+    <li>视频开始播之后，再按一次 <span class="kbd">Insert</span>，鼠标就还给游戏了，你可以正常操作</li>
+  </ol>
+
+  <p style="color:#6b6a63;font-size:13px">节目单最上面还会有一个「<b>本地视频</b>」卡片——
+  那是你在 <code>assets\videos\</code> 里自己放的 mp4，点进去直接播。</p>
+
+  <div class="ok">
+    <b>第二次开就不用选了。</b>脚本会记住你看到哪一集、第几秒，
+    下次运行直接把那一集接回来自动播，连引导页都不出现。
+  </div>
+
+  <h2><span class="num">4</span>核心功能：播到打怪点自动暂停</h2>
+
+  <p>这是这个脚本最要紧的部分。<b>它已经默认开着</b>，播视频时自动生效，不用你设置。</p>
+
+  <h3>它怎么判断"该你打怪了"</h3>
+  <p>不是靠"看到宝箱就停"这种傻规则——那种做法在路上随便遇到个宝箱就会误停。
+  这里是把 UP 主（影月月）<b>全集 566 集、共 4950 分钟</b>的视频全部转成文字，
+  统计出"他说某类话之后，有多大概率叫你自己打"，再按概率排出每一集该停在第几秒。</p>
+
+  <p>统计结果大致是这样：</p>
+  <table>
+    <tr><th>他说的话</th><th style="width:110px">之后要打怪的概率</th><th>所以</th></tr>
+    <tr><td>「镇守宝箱」</td><td><b>82%</b></td><td>基本都要打，停</td></tr>
+    <tr><td>「这个神瞳」</td><td>16%</td><td>多半不用停</td></tr>
+    <tr><td>「这里有个宝箱」</td><td><b>14%</b></td><td><b>永远不单独停</b>——路上遇到宝箱不会再打断你了</td></tr>
+  </table>
+
+  <p>一共排出了 <b>1526 个暂停点</b>，分两种：</p>
+  <ul>
+    <li><b>打怪点（1356 个）</b>：他说"把怪清一下"，视频立刻停住，提示"打完再按播放"。<br>
+      <span style="color:#6b6a63;font-size:13px">时间轴上是<span style="color:#e24b4a">红点</span>。</span></li>
+    <li><b>看完再停（170 个）</b>：限时挑战、打 boss、讲操作这种，<b>整段演示看完才停</b>，
+      提示"这段看完了 轮到你上"。<br>
+      <span style="color:#6b6a63;font-size:13px">因为这类内容停早了等于没教你怎么打。时间轴上是<span style="color:#378add">青点</span>。</span></li>
+  </ul>
+
+  <h3>觉得烦？随时关掉，或者调稀一点</h3>
+  <p>点控制栏的 <b>⚙</b> 打开设置面板 → 找到「<b>打怪点</b>」那一行 → 点一下「开」变成「<b>关</b>」。</p>
+  <p style="color:#6b6a63;font-size:13px">关掉会存进设置，重开脚本也还是关着，不会自己又弹回来。
+  想再开就再点一下。也可以在 BetterGI 的脚本设置里取消勾选「打怪点到点自动暂停」。</p>
+  <p style="color:#6b6a63;font-size:13px">只想少停一点、不想全关：把设置里的
+  「<b>暂停点最小间隔</b>」从 20 改成 30~45（间隔小于它的两个点会合并成一个）。</p>
+
+  <h2><span class="num">5</span>鼠标怎么还给游戏</h2>
+
+  <p>浮窗有两种状态，靠 <span class="kbd">Insert</span> 切换：</p>
+  <table>
+    <tr><th style="width:150px">状态</th><th>效果</th></tr>
+    <tr><td><b>鼠标穿透</b>（默认）</td><td>鼠标可以点游戏、打怪，浮窗只是"贴"在画面上，不挡操作</td></tr>
+    <tr><td><b>可交互</b></td><td>鼠标可以点浮窗：拖进度条、点按钮、开侧栏。此时游戏暂时点不到</td></tr>
+  </table>
+
+  <div class="warn">
+    <b>重要：看攻略时别一直开着"可交互"。</b>浮窗可交互时会抢游戏的前台焦点，
+    可能导致 BetterGI 自带的「过剧情 / 自动剧情」失效。
+    调完设置就按 <span class="kbd">Insert</span> 切回穿透。
+    <br><br>
+    如果确实需要一边挂着浮窗一边自动过剧情，请到 BetterGI 设置里打开「<b>后台运行</b>」，
+    这样游戏不在前台也能自动操作。
+  </div>
+
+  <h2><span class="num">6</span>常用热键</h2>
+
+  <table>
+    <tr><th style="width:130px">按键</th><th>作用</th></tr>
+    <tr><td><span class="kbd">Insert</span></td><td>切换「鼠标穿透 / 可交互」（最常用）</td></tr>
+    <tr><td><span class="kbd">~</span></td><td>播放 / 暂停（Esc 下面那颗波浪号键；笔记本的 F9 常被亮度键占用，所以不用 F9 了）</td></tr>
+    <tr><td><span class="kbd">Alt</span>（按住）</td><td>临时变成可交互，松开就退回穿透——拖进度条很方便</td></tr>
+    <tr><td><span class="kbd">End</span></td><td>开关 B 站登录窗（登录窗会全屏盖住画面，只能靠它关）</td></tr>
+  </table>
+
+  <p style="color:#6b6a63;font-size:13px">其它热键（快进、快退、调速、透明度、上一集…）都能在 ⚙ 面板里改，
+  默认多数是空的，需要自己去绑。</p>
+
+  <div class="tip">
+    <b>别去绑 F12 / F5。</b>浮窗内核是浏览器，F12 会弹出开发者工具、F5 会刷新页面把进度清零。
+    脚本默认已经帮你避开了这些键（设置里叫「热键避开浮窗浏览器的快捷键」，保持开启）。
+  </div>
+
+  <h2><span class="num">7</span>可选：字幕和方向提示</h2>
+
+  <p>想要视频下方的<b>字幕</b>、以及"往西南走"这种<b>方向箭头提示</b>，需要填 B 站登录凭证。
+  不要这两个功能的话，<b>完全跳过这一步</b>，其它一切正常。</p>
+
+  <ol class="steps">
+    <li>浏览器登录 B 站</li>
+    <li>按 <span class="kbd">F12</span> → 应用 / 存储 → Cookie → <code>bilibili.com</code></li>
+    <li>找到 <code>SESSDATA</code>，复制它的值（很长一串）</li>
+    <li>粘到 BetterGI 里这个脚本的设置项「<b>B站 SESSDATA</b>」</li>
+  </ol>
+
+  <div class="warn">
+    <b>SESSDATA 等于你的登录凭证，别发给任何人。</b>它只存在你自己电脑上 BetterGI 的配置里，
+    脚本不会上传。想让它失效：B 站 → 设置 → 安全 → 退出所有设备。
+  </div>
+
+  <h2><span class="num">8</span>常见问题</h2>
+
+  <h3>窗口里只有一张引导页 / 不播视频</h3>
+  <ul>
+    <li>说明还没选过片。按 <span class="kbd">Insert</span>，点「<b>打开节目单</b>」，选一集就开始播。</li>
+    <li>如果侧栏是空的：检查 BetterGI 有没有开「JS HTTP 权限」，然后重开脚本。</li>
+    <li>选过一次之后就不会再出现引导页了，下次直接接着看。</li>
+  </ul>
+
+  <h3>视频一直转圈 / 加载失败</h3>
+  <ul>
+    <li><b>先等 12 秒</b>。取地址超过 12 秒、或者地址拿到了但 25 秒还没起播，
+      画面会直接弹出原因和一个「<b>重试</b>」按钮，不用干等。</li>
+    <li>点「重试」还不行，看提示里的文字：写「JS HTTP 权限」就去 BetterGI 设置里勾上。</li>
+    <li>B 站有时限制匿名播放，试试在设置里填上 SESSDATA 再重开。</li>
+    <li>清晰度只支持 360P / 720P（直链自播的限制），设置里「在线清晰度」保持 <b>720P</b> 最稳。</li>
+  </ul>
+
+  <h3>开了浮窗，BetterGI 的自动剧情就不能用了</h3>
+  <ul>
+    <li>原因：浮窗进入「可交互」状态时会抢游戏前台焦点，游戏一失焦，
+      BGI 的自动剧情（在没开后台运行的情况下）就点不到游戏了。</li>
+    <li><b>v1.6.27 已从源头关掉最主要的两个触发</b>：
+      「启动后可拖动多少秒」默认改成 <b>0</b>（以前默认 25 秒，等于每次启动都抢 25 秒焦点）；
+      「进度条热区 / 鼠标悬停」默认也是关的。</li>
+    <li>如果还是不行：按 <span class="kbd">Insert</span> 切回鼠标穿透；
+      或到 BetterGI 设置里打开「<b>后台运行</b>」（这是最彻底的解法）。</li>
+  </ul>
+
+  <h3>打怪点停得太频繁 / 停的位置不对</h3>
+  <ul>
+    <li><b>先调「暂停点最小间隔」</b>（默认 20 秒）。这是同一集里两个点靠太近就合并成一个的阈值——
+      他有时候会先后说两句"把怪清一下"，中间只隔十几秒，原样播会停一下、点继续、十几秒后又停。
+      <br><span style="color:#6b6a63;font-size:13px">
+      改成 <b>30~45</b> 会更少打断（总点数从 1526 降到 1375 / 1292）；填 <b>0</b> 则不合并，全保留。</span></li>
+    <li>还是太频繁：⚙ → 「打怪点」直接关掉。</li>
+    <li>位置不对：可以手动调整——控制栏的「<b>＋怪</b>」能在当前时刻补一个点，
+      靠近已有的点会移动它，<span class="kbd">Shift</span> + 点击能删掉。</li>
+  </ul>
+
+  <h3>系列栏（侧栏）关不掉 / 挡视野</h3>
+  <ul>
+    <li><b>v1.6.28 起它会自己收回</b>：选完视频、松开 <span class="kbd">Alt</span>、
+      鼠标挪出浮窗、或者点回游戏，系列栏都自动关掉，不用再去点一次 <b>⧉</b>。
+      手动关也可以：按 <span class="kbd">Esc</span>，或再点一下 <b>⧉</b>。</li>
+    <li>它只在"你正在挑片"的时候存在，不是常驻面板——想看当前在播哪一集，
+      画面下方那行<b>字幕/方向提示</b>和 Ctrl 面板里的进度就够了。</li>
+    <li>设置里勾着「<b>显示合集侧栏</b>」的话：每次按 <span class="kbd">Alt</span> 它还是会自己摆出来，
+      松开再收回，不用每次去点 <b>⧉</b>。</li>
+  </ul>
+
+  <h3>能自己加视频吗</h3>
+  <ul>
+    <li><b>能，而且不用改设置。</b>把 mp4 放进脚本目录下的 <code>assets\videos\</code>，
+      打开侧栏，最上面会多出一个「<b>本地视频</b>」卡片，点进去就是一个文件列表，点哪个播哪个。</li>
+    <li>刚放进去没看到？点侧栏右上角的 <b>↻</b> 重新扫一遍，不用重开脚本。</li>
+    <li>只列 mp4 / m4v / webm / mov。mkv、avi 这类多数播不了，不会列出来。</li>
+    <li>也可以直接填 B 站 BV 号 / 链接（设置里「在线视频 BV号」），填了就优先播在线的，不用下载。</li>
+  </ul>
+
+  <h2><span class="num">9</span>不想要了怎么删干净</h2>
+  <ol class="steps">
+    <li>BetterGI 脚本列表里停掉「视频悬浮窗」</li>
+    <li>删掉 <code>BetterGI\User\JsScript\VideoMask\</code> 整个文件夹</li>
+    <li>BetterGI 的配置里删掉这个脚本对应的配置组（可选，留着也不影响）</li>
+  </ol>
+
+  <div class="footer">
+    <p>VideoMask v1.6.28 · 暂停点数据来自 UP 主影月月全集 566 集 / 4950 分钟字幕统计，
+    评测精确率 96.1%、召回率 100%。</p>
+    <p>实现原理、每个功能的取舍、踩过的坑，见同目录的 <code>docs\开发记录.md</code>；
+    每个版本改了什么见 <code>CHANGELOG.md</code>。</p>
+  </div>
+
+</div>
+</body>
+</html>
