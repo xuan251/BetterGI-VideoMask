@@ -97,31 +97,33 @@
     </tr>
   </table>
 
-  <h2><span class="num">2</span>安装（四步）</h2>
+  <h2><span class="num">2</span>安装</h2>
 
   <div class="ok">
-    <b>懒得动手？让你的 AI 装。</b>把同目录的
-    <code>给AI的安装指令.md</code> 整份发给你常用的 AI 助手，
-    它会自己找 BetterGI 目录、复制文件、改配置、逐项校验，最后只剩第 2 步的勾选要你点。
+    <b>这一章只讲个大概。</b>完整的手动安装（12 步 + 界面示意图 + 每步的验证方法 + 装不上怎么办）
+    在 <a href="手动安装教程.html"><b>手动安装教程.html</b></a> 里，装的时候照着那份做最稳。<br>
+    懒得动手的话，把同目录的 <code>给AI的安装指令.md</code> 整份发给你常用的 AI 助手，
+    它会自己找目录、复制文件、改配置、逐项校验。
   </div>
 
   <ol class="steps">
     <li>
       <b>把 <code>VideoMask</code> 文件夹整个放进 BetterGI 的脚本目录</b><br>
       目标路径：<code>BetterGI\User\JsScript\VideoMask\</code><br>
-      <span style="color:#6b6a63;font-size:13px">放完之后，<code>main.js</code> 应该正好在这个路径下：
-      <code>...\BetterGI\User\JsScript\VideoMask\main.js</code>，不要多套一层文件夹。</span>
+      <span style="color:#6b6a63;font-size:13px">不知道 BGI 装在哪？<b>全自动 → JS 脚本 → 「打开脚本目录」</b>，让它自己弹给你。
+      放完之后 <code>main.js</code> 应该正好在 <code>...\JsScript\VideoMask\main.js</code>，不要多套一层。</span>
     </li>
     <li>
-      <b>在 BetterGI 设置里勾上「JS HTTP 权限」</b><br>
-      <span style="color:#6b6a63;font-size:13px">侧栏、弹幕、字幕、合集列表都要靠它联网，不开就只有一个空窗口。</span>
+      <b>全自动 → 调度器 → 通用设置，勾上「启用 JS HTTP 权限」，然后重启 BetterGI</b><br>
+      <span style="color:#6b6a63;font-size:13px">侧栏、弹幕、字幕、合集列表都要靠它联网。
+      <b>不勾或勾了不重启，表现就是"视频能播但侧栏一片空白"</b>——这是最常见的装错。</span>
     </li>
     <li>
-      <b>刷新 BetterGI</b><br>
-      在脚本列表里点刷新，应该能看到一个叫「<b>视频悬浮窗</b>」的脚本。<br>
+      <b>刷新 BetterGI，并在调度器里建个配置组</b><br>
+      脚本列表里应该出现「<b>视频悬浮窗</b>」。<br>
       <span style="color:#6b6a63;font-size:13px">
-      想让「全自动 → 调度器」里也能直接跑它：调度器 → 选中配置组 → 右键「添加」→ 选 JS 脚本 → 视频悬浮窗。
-      用上面的 AI 指令安装的话，这一步会连权限一起自动配好。</span>
+      想让「全自动 → 调度器」里也能直接跑它：调度器 → <b>新增配置组</b> → 选中它 →
+      <b>添加 → JS 脚本 → 视频悬浮窗</b>。</span>
     </li>
     <li>
       <b>运行它</b><br>
