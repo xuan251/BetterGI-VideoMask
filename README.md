@@ -11,9 +11,13 @@
 > A [BetterGI](https://github.com/babalae/better-genshin-impact) JS script that overlays a Bilibili
 > walkthrough video on Genshin Impact, with auto-pause at fight timestamps. UI is in Chinese.
 
-![界面示意](preview.png)
+<img src="docs/img/demo-play.webp" width="720" alt="攻略视频浮在游戏画面上，边玩边看">
 
-![侧栏](sidebar.png)
+*边玩边看：视频浮在画面上，鼠标默认穿透给游戏，按住 `Alt` 才能操作它。*
+
+<img src="sidebar.png" width="720" alt="侧栏：地图 → 分类 → 版本 → 分P">
+
+*四级侧栏：地图 → 分类（宝箱 / 神瞳 / 主线…）→ 版本 → 分 P。*
 
 ---
 
@@ -47,6 +51,10 @@
 > 每步都写了怎么验证做对了，还带 5 条自检和 6 类故障对照。
 > **想省事**：把 [`给AI的安装指令.md`](给AI的安装指令.md) 整份发给你自己的 AI，让它照着做。
 > **想玩功能**：看 [`使用教程.html`](使用教程.html)，讲怎么用而不是怎么装。
+
+<img src="docs/img/demo-first.webp" width="720" alt="第一次启动：半透明引导页 → 打开节目单 → 地图 → 分类 → 版本 → 分P">
+
+*第一次启动只有一张引导页，选过一集之后就记住了——以后启动直接接着上次那一集播。*
 
 ## 热键（都能在浮窗里改）
 
@@ -133,7 +141,8 @@ CHANGELOG.md            每个版本改了什么
 
 - 本仓库**不包含任何视频内容**。视频来自 B 站，版权归原作者（攻略内容出自 UP 主
   [影月月](https://space.bilibili.com/431073645)），脚本只是把公开视频**嵌到浮窗里播放**，
-  不下载、不转存、不二次分发。
+  不下载、不转存、不二次分发。上面两张动图是作者的操作录屏，画面里带到了游戏和攻略视频，
+  仅用于展示功能。
 - 内置的「打怪点」是**从公开字幕统计出来的时间戳索引**（几点几分该停），不含任何画面或文字原文。
 - 本项目与米哈游 / HoYoverse、B 站、BetterGI 官方**均无关联**，属第三方个人作品。
   使用本脚本时请遵守游戏与平台的服务条款，风险自负。
